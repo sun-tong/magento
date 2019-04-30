@@ -1,0 +1,16 @@
+$visibility = array(
+		Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
+		Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG
+	);
+	$catIds = $_product->getCategoryIds();
+
+	$collection = Mage::getResourceModel('catalog/product_collection')
+		->addAttributeToSort('created_at','desc')
+		->addFieldToFilter('type_id', array('eq' => 'simple'))
+		->addAttributeToFilter('visibility', $visibility)
+		->addAttributeToFilter("entity_id",array("neq"=>$_product->getId()))
+        ->addFieldToFilter('status', array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
+		->joinField('category_id','catalog/category_product','category_id','product_id=entity_id',null,'left')
+		->addAttributeToFilter('category_id', array('in' => $catIds))
+		->addAttributeToSelect('*')
+		->load();
