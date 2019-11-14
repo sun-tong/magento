@@ -1,0 +1,26 @@
+<?php
+require_once './app/Mage.php';
+umask(0);
+Mage::app();
+
+$collection = Mage::getModel('customer/customer')->getCollection()
+   ->addAttributeToSelect('email')
+   ->addAttributeToSelect('firstname')
+   ->addAttributeToSelect('lastname')
+   ->addAttributeToFilter('mobilephone', array('notnull' => true));
+
+$fopen = fopen('var/email.csv','w');
+$csvHeader = array("email","firstname","lastname","mobilephone");// Add the fields you need to export
+fputcsv( $fopen , $csvHeader,",");
+
+foreach ($collection as $customer) {
+	$email = $customer['email'];
+	$firstname = $customer['firstname'];
+	$lastname = $customer['lastname'];
+	$mobilephone = $customer['mobilephone'];
+	fputcsv($fopen, array($email,$firstname,$lastname,$mobilephone), ",");//Add the fields you added in csv header
+
+}
+
+echo 'over';
+fclose($fopen );
