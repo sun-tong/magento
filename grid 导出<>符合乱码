@@ -1,0 +1,16 @@
+app/code/core/Mage/Adminhtml/Block/Widget
+新增方法
+function d_encodeUTF8($array){  
+    //Convert the predefined HTML entities "&lt;" (less than) and "&gt;" (greater than) to characters:
+		foreach($array as $key=>$value){  
+			$array[$key] = htmlspecialchars_decode($value);  
+		} 		   
+		return $array;  
+	}
+  
+  这三处添加
+  function _getExportHeaders()
+  function _getExportTotals()
+  function _exportCsvItem()
+  $row = $this->d_encodeUTF8($row);
+  
