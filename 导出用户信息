@@ -14,6 +14,12 @@ $csvHeader = array("email","firstname","lastname","mobilephone");// Add the fiel
 fputcsv( $fopen , $csvHeader,",");
 
 foreach ($collection as $customer) {
+	foreach ($customer->getAddresses() as $address)
+	{
+		$customerAddress = $address->toArray();		
+		$country = $customerAddress['country_id'];
+		//print_r($country);exit;
+	}
 	$email = $customer['email'];
 	$firstname = $customer['firstname'];
 	$lastname = $customer['lastname'];
