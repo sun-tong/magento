@@ -1,0 +1,17 @@
+ <?php
+require_once 'app/Mage.php';
+Mage::app();
+
+$collection = Mage::getModel('catalog/product')->getCollection();
+
+foreach($collection as $product) {
+    if ($product->getId()){
+		$mediaApi = Mage::getModel("catalog/product_attribute_media_api");
+		$items = $mediaApi->items($product->getId());
+		foreach($items as $item)
+			if($item['position'] == "2"){				
+				$mediaApi->remove($product->getId(), $item['file']);
+			}
+			
+	}
+}
