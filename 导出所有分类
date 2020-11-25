@@ -1,0 +1,57 @@
+<?php
+
+define('MAGENTO', realpath(dirname(__FILE__)));
+require_once MAGENTO . '/app/Mage.php';
+Mage::app();
+
+$category = Mage::getModel('catalog/category');
+$tree = $category->getTreeModel();
+$tree->load();
+
+$ids = $tree->getCollection()->getAllIds();
+$categories = array();
+
+
+if ($ids)
+{
+    // Open file and print headers
+    $fp = fopen('category_export.csv', 'w');
+    $headers = ['id', 'name', 'path', 'url'];
+    fputcsv($fp, $headers, ",", '"');
+
+    // Loop throught every category ID in the category tree
+    foreach ($ids as $id)
+    {
+        // Ignore categories 1 and 2
+        if(in_array($id, [1,2])) {
+            continue;
+        };
+
+        // Load the category and get the URL key, name, and path
+        $category->load($id);
+        $url_key = Mage::helper('catalog/category')->getCategoryUrlPath($category->getUrlPath(), true);
+        $categories[$id]['name'] = $category->getName();
+        $categories[$id]['path'] = $category->getPath();
+
+        // Convert the numeric path into category names
+        $path = explode('/', $categories[$id]['path']);
+        $pathnames = array();
+        foreach ($path as $pathId)
+        {
+            // Ignore categories 1 and 2
+            if(in_array($pathId, [1,2])) {
+                continue;
+            };
+            //$pathCat=Mage::getModel('catalog/category')->load($pathId);
+            //$pathnames[]=$pathCat->getName();
+            $pathnames[] = $categories[$pathId]['name'];
+        }
+
+        // Save this line to the CSV file
+        $line = [$id, $category->getName(), implode(' > ', $pathnames), $url_key];
+        fputcsv($fp, $line, ",", '"');
+    }
+
+    // Close the file handle
+    fclose($fp);
+}
