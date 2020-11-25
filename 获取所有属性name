@@ -1,0 +1,23 @@
+<?php 
+	require_once 'app/Mage.php';
+	umask(0);
+	Mage::app();
+ 	
+$fopen = fopen('var/attribute.csv', 'w');
+$csvHeader = array("Attribute Name","Attribute options");
+fputcsv( $fopen , $csvHeader);	
+	
+$productAttrs = Mage::getResourceModel('catalog/product_attribute_collection');
+foreach($productAttrs as $_attr)
+{
+	$attributeCode = $_attr->getAttributeCode();
+	$values = Mage::getSingleton('eav/config')->getAttribute(Mage_Catalog_Model_Product::ENTITY, $attributeCode);
+	$attributesetName = $values->getFrontendLabel();
+	$options = $values->getSource()->getAllOptions(false);
+	$label = "";
+	foreach($options as $option){
+		$label .= $option['label'].' || ';
+	}	
+	
+	fputcsv($fopen, array($attributesetName,$label));
+} 
