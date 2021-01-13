@@ -1,0 +1,27 @@
+<?php 
+	require_once 'app/Mage.php';
+	umask(0);
+	Mage::app();
+ 		echo time().'<br>';
+	$file = fopen('461.csv','r');
+	$lists = array();
+	$i = 0;
+	while ($data = fgetcsv($file)) { 
+		$sku = trim($data[0]);
+		if($sku != 'sku'){
+			$lists[$i]['sku'] = $sku;
+			$lists[$i]['id'] = trim($data[1]);
+			$i++;
+		}
+	}
+	foreach($lists as $list){
+		$sku = $list['sku'];		
+		$catId = rtrim($list['id'],',');
+		$id = explode(",",$catId);
+		$product = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+		$product->setCategoryIds($id);
+		$product->save();
+	}
+	echo time().'<br>';
+	echo 'over';
+?>
