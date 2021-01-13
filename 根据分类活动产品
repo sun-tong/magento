@@ -1,0 +1,38 @@
+ <?php
+require_once 'app/Mage.php';
+Mage::app();
+
+$fopen = fopen('var/461.csv', 'w');
+$csvHeader = array("sku");// Add the fields you need to export
+fputcsv( $fopen , $csvHeader,",");
+echo microtime().'<br>';
+
+$collection = Mage::getModel('catalog/product')->getCollection()
+    ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+    ->addAttributeToFilter('category_id', array('in' => array(461)));
+	
+foreach ($collection as $_product) {
+	if ($_product->getId()) {
+
+		if ($_product->getTypeId() == "configurable") {
+			$productSku = $_product->getSku(); 
+			fputcsv($fopen, array($productSku), ",");
+			$childProducts = Mage::getModel('catalog/product_type_configurable')
+						->getUsedProducts(null,$_product);
+			foreach ($childProducts as $childProduct) {
+			    $productSku = $childProduct->getSku();
+				fputcsv($fopen, array($productSku), ",");
+			}
+		} else {
+			$productSku = $_product->getSku(); 
+			fputcsv($fopen, array($productSku), ",");
+			
+		}
+		
+		
+
+	}
+}
+echo microtime().'<br>';
+echo 'Game Over';
+fclose($fopen );
