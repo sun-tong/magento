@@ -16,11 +16,13 @@ foreach ($collection as $_product) {
 	if ($_product->getTypeId() == "configurable") {
 		$productSku = $_product->getSku(); 
 		$CategoryIds = $_product->getCategoryIds(); 
-		fputcsv($fopen, array($productSku,$CategoryIds), ",");
+		$CategoryIdString = join(",",$CategoryIds).','; 
+		fputcsv($fopen, array($productSku,$CategoryIdString), ",");
 		$childProducts = Mage::getModel('catalog/product_type_configurable')
 					->getUsedProducts(null,$_product);
 		foreach ($childProducts as $childProduct) {
-			fputcsv($fopen, array($productSku,$CategoryIds), ",");
+			$productSku = $childProduct->getSku();
+			fputcsv($fopen, array($productSku,$CategoryIdString), ",");
 		}
 	}		
 }
