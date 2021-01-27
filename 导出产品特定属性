@@ -4,17 +4,19 @@
 	Mage::app();
  	
 $fopen = fopen('var/65.csv', 'w');
-$csvHeader = array("sku","new_name","name","meta_title","meta_keyword","meta_description","wedd_color","wedd_silhouette","wedd_neckline","wedd_waist","wedd_hemline_train","fabric","wedd_sleeve_length","wedd_back_details","wedd_embellishments","wedd_size","wedd_wrap","wedd_boning","wedd_built_in_bra","wedd_fully_lined","wedd_years","wedd_designer","wedd_trends","wedd_venues","notes","custom_text","","","","","","","");
+$csvHeader = array("sku","new_name","name","meta_title","meta_keyword","meta_description","wedd_color","wedd_silhouette","wedd_neckline","wedd_waist","wedd_hemline_train","fabric","wedd_sleeve_length","wedd_back_details","wedd_embellishments","wedd_size","wedd_wrap","wedd_boning","wedd_built_in_bra","wedd_fully_lined","wedd_years","wedd_designer","wedd_trends","wedd_venues","notes","custom_text","price","special_price","weight");
 fputcsv( $fopen , $csvHeader);	
 	
 	$modifyAttributeIds = array('65'); //需要修改交期的属性id 65婚纱礼服 68伴娘
 	$collection = Mage::getModel('catalog/category')->getProductCollection()
+		// ->addFieldToFilter('entity_id', array('in'=> array(959)))
 		 ->addAttributeToSelect('sku') 
 		 ->addAttributeToSelect('name') 
 		 ->addAttributeToSelect('new_name') 
 		 ->addAttributeToSelect('meta_title') 
 		 ->addAttributeToSelect('meta_keyword')
 		 ->addAttributeToSelect('meta_description')
+		 ->addAttributeToSelect('custom_text')
 		 ->addAttributeToSelect('price')
 		 ->addAttributeToSelect('special_price')
 		 ->addAttributeToSelect('weight')
@@ -32,6 +34,7 @@ foreach($collection as $_product)
 	$meta_title = $_product->getMetaTitle();
 	$meta_keyword = $_product->getMetaKeyword();
 	$meta_description = $_product->getMetaDescription();	
+	$custom_text = $_product->getCustom_text();	
 	$price = $_product->getPrice();	
 	$special_price = $_product->getSpecialPrice();	
 	$weight = $_product->getWeight();	
@@ -42,10 +45,13 @@ foreach($collection as $_product)
 	$wedd_waist = $product->getAttributeText("wedd_waist");
 	$wedd_hemline_train = $product->getAttributeText("wedd_hemline_train");
 	$fabric = $product->getAttributeText("fabric");
+	$fabric = join(",",$fabric);
 	$wedd_sleeve_length = $product->getAttributeText("wedd_sleeve_length");
 	$wedd_back_details = $product->getAttributeText("wedd_back_details");
 	$wedd_embellishments = $product->getAttributeText("wedd_embellishments");
+	$wedd_embellishments = join(",",$wedd_embellishments);
 	$wedd_size = $product->getAttributeText("wedd_size");
+	$wedd_size = join(",",$wedd_size);
 	$wedd_wrap = $product->getAttributeText("wedd_wrap");
 	$wedd_boning = $product->getAttributeText("wedd_boning");
 	$wedd_built_in_bra = $product->getAttributeText("wedd_built_in_bra");
@@ -53,9 +59,10 @@ foreach($collection as $_product)
 	$wedd_years = $product->getAttributeText("wedd_years");
 	$wedd_designer = $product->getAttributeText("wedd_designer");
 	$wedd_trends = $product->getAttributeText("wedd_trends");
+	$wedd_trends = join(",",$wedd_trends);
 	$wedd_venues = $product->getAttributeText("wedd_venues");
-	$notes = $product->getAttributeText("notes");
-	$custom_text = $product->getAttributeText("custom_text");
+	$wedd_venues = join(",",$wedd_venues);
+	$notes = $product->getNotes();
 
 	fputcsv($fopen, array($sku,$new_name,$name,$meta_title,$meta_keyword,$meta_description,$wedd_color,$wedd_silhouette,$wedd_neckline,$wedd_waist,$wedd_hemline_train,$fabric,$wedd_sleeve_length,$wedd_back_details,$wedd_embellishments,$wedd_size,$wedd_wrap,$wedd_boning,$wedd_built_in_bra,$wedd_fully_lined,$wedd_years,$wedd_designer,$wedd_trends,$wedd_venues,$notes,$custom_text,$price,$special_price,$weight));
 } 
