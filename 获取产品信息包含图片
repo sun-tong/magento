@@ -1,0 +1,40 @@
+ <?php
+require_once 'app/Mage.php';
+Mage::app();
+
+$fopen = fopen('var/Bridesmaid.csv', 'w');
+$csvHeader = array("SKU","Name","URL to product","Price","Retail Price","URL to image","URL to thumbnail image");// Add the fields you need to export
+fputcsv( $fopen , $csvHeader,",");
+echo time().'<br>';
+$modifyAttributeIds = array('68'); //需要修改交期的属性id 65婚纱礼服 68伴娘
+$_collection = Mage::getModel('catalog/product')->getCollection()
+				->setOrder('entity_id', 'desc')
+				->addAttributeToSelect('id')
+				->addAttributeToFilter('attribute_set_id', array('in' => $modifyAttributeIds))
+				->addAttributeToSelect('sku')
+				->addAttributeToSelect('name')
+				->addAttributeToSelect('price')
+				->addAttributeToSelect('image')
+				->addFinalPrice();
+	
+	
+$_collection->addAttributeToFilter('status', 1);
+$_collection->addAttributeToFilter('visibility', 4);
+			
+foreach ($_collection as $_product) {
+	if ($_product->getId()) {		
+		
+		$productSku = $_product->getSku();
+		$name = $_product->getName();
+		$URL = $_product->getProductUrl();
+		$FinalPrice = $_product->getFinalPrice();
+		$price = $_product->getPrice();
+		$imageLink = Mage::getModel('catalog/product_media_config')->getMediaUrl($_product->getImage());
+
+		fputcsv($fopen, array($productSku,$name,$URL,$FinalPrice,$price,$imageLink,$imageLink), ",");//Add the fields you added in csv header
+
+	}
+}
+echo time().'<br>';
+echo 'Game Over';
+fclose($fopen );
